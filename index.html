@@ -1,951 +1,148 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>俄罗斯三城 7 日游 · 莫斯科·摩尔曼斯克·圣彼得堡</title>
-    <!-- Google Maps JavaScript API (请替换 YOUR_API_KEY) -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMaps" async defer></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-        }
-
-        body {
-            background-color: #f5f7fb;
-            color: #1e293b;
-            line-height: 1.4;
-            padding-bottom: 32px;
-        }
-
-        /* 顶部固定栏 */
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 10px 16px 8px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-        }
-
-        .header-title {
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: -0.3px;
-            color: #0f172a;
-        }
-
-        .header-sub {
-            font-size: 12px;
-            color: #64748b;
-            font-weight: 400;
-            margin-top: 2px;
-        }
-
-        .countdown-pill {
-            background: #0f172a;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            cursor: pointer;
-        }
-
-        .countdown-pill .dot {
-            width: 6px;
-            height: 6px;
-            background: #fbbf24;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 16px 16px 0;
-        }
-
-        /* 航班大标签卡片 */
-        .flight-hero {
-            background: linear-gradient(145deg, #0b1e33, #1a2f4a);
-            border-radius: 24px;
-            padding: 20px 18px 18px;
-            color: white;
-            margin-bottom: 20px;
-            box-shadow: 0 20px 30px -10px rgba(0, 20, 40, 0.3);
-        }
-
-        .flight-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .flight-icon {
-            font-size: 22px;
-            line-height: 1;
-            margin-top: 2px;
-        }
-
-        .flight-info {
-            flex: 1;
-        }
-
-        .flight-code {
-            font-size: 13px;
-            font-weight: 600;
-            color: #94a3b8;
-            letter-spacing: 0.3px;
-            margin-bottom: 4px;
-        }
-
-        .flight-route {
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: -0.2px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .flight-time {
-            font-size: 13px;
-            color: #cbd5e1;
-            margin-top: 4px;
-        }
-
-        .flight-divider {
-            border: 0;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 14px 0;
-        }
-
-        .countdown-grid {
-            display: flex;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .countdown-card {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 10px 12px;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .countdown-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #94a3b8;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .countdown-value {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #f8fafc;
-            line-height: 1.2;
-        }
-
-        .countdown-value small {
-            font-size: 13px;
-            font-weight: 500;
-            color: #94a3b8;
-            margin-left: 4px;
-        }
-
-        /* 城市地图卡片 */
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #0f172a;
-        }
-
-        .map-card {
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.08);
-            margin-bottom: 24px;
-            border: 1px solid #e9eef3;
-        }
-
-        #city-map {
-            height: 220px;
-            width: 100%;
-            z-index: 1;
-        }
-
-        .map-legend {
-            display: flex;
-            gap: 16px;
-            padding: 12px 16px;
-            font-size: 12px;
-            color: #475569;
-            background: #ffffff;
-            border-top: 1px solid #eef2f6;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        /* 时间轴 */
-        .timeline {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .day-card {
-            background: white;
-            border-radius: 24px;
-            padding: 18px 16px 16px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
-            border: 1px solid #e9eef3;
-            transition: all 0.1s ease;
-        }
-
-        .day-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .day-badge {
-            font-weight: 800;
-            font-size: 18px;
-            color: #0f172a;
-            letter-spacing: -0.3px;
-        }
-
-        .day-date {
-            font-size: 13px;
-            color: #64748b;
-            background: #f1f5f9;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-weight: 500;
-        }
-
-        .day-route {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .day-route span {
-            background: #eef2f6;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-        }
-
-        .timeline-items {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-            border-left: 2px solid #dbeafe;
-            padding-left: 14px;
-            margin-left: 6px;
-        }
-
-        .time-item {
-            display: flex;
-            gap: 12px;
-            font-size: 14px;
-            align-items: baseline;
-        }
-
-        .time-stamp {
-            font-weight: 600;
-            color: #0f172a;
-            min-width: 52px;
-            font-variant-numeric: tabular-nums;
-            font-size: 13px;
-        }
-
-        .time-desc {
-            color: #334155;
-            flex: 1;
-        }
-
-        .time-desc i {
-            font-style: normal;
-            color: #64748b;
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        .day-map {
-            height: 190px;
-            width: 100%;
-            border-radius: 18px;
-            margin: 12px 0 10px;
-            background: #eef2f6;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
-
-        .day-tip {
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            color: #78350f;
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-            margin-top: 6px;
-        }
-
-        .day-tip .emoji {
-            font-size: 16px;
-            line-height: 1.2;
-        }
-
-        .booking-links {
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: #f0f7ff;
-            border-radius: 14px;
-            border: 1px solid #dbeafe;
-            font-size: 12.5px;
-            color: #1e40af;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .booking-links .label {
-            font-weight: 600;
-            color: #1e3a8a;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 2px;
-        }
-
-        .booking-links a {
-            color: #2563eb;
-            text-decoration: none;
-            word-break: break-all;
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            line-height: 1.4;
-        }
-
-        .booking-links a::before {
-            content: "🔗";
-            font-size: 11px;
-            flex-shrink: 0;
-        }
-
-        .booking-links a:hover {
-            text-decoration: underline;
-        }
-
-        .footer-note {
-            margin-top: 28px;
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 16px;
-            font-size: 12px;
-            color: #475569;
-            border: 1px solid #e9eef3;
-            line-height: 1.6;
-        }
-
-        .footer-note a {
-            color: #2563eb;
-            text-decoration: none;
-            word-break: break-all;
-        }
-
-        ::-webkit-scrollbar {
-            width: 0;
-            background: transparent;
-        }
-
-        @media (max-width: 380px) {
-            .flight-route {
-                font-size: 14px;
-            }
-            .countdown-value {
-                font-size: 17px;
-            }
-            .time-stamp {
-                min-width: 44px;
-                font-size: 12px;
-            }
-        }
-
-        /* Google Maps 容器圆角 */
-        .gm-style {
-            border-radius: 18px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f6f2">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>AI 旅行网页模板</title>
+  <link rel="stylesheet" href="styles.css?v=20260910-3">
+  <link rel="stylesheet" href="ledger.css?v=20260910-2">
+  <script src="runtime-storage.js?v=20260910-2" defer></script>
+  <script src="overview-map.js?v=20260910-2" defer></script>
+  <script src="route-ui.js?v=20260910-2" defer></script>
+  <script src="app.js?v=20260910-4" defer></script>
+  <script src="ticket-pdf-preview.js?v=20260910-2" defer></script>
+  <script src="ledger.js?v=20260910-3" defer></script>
+  <script src="site-navigation.js?v=20260910-2" defer></script>
 </head>
 <body>
+  <a class="skip-link" id="skip-link" href="#main">跳到主要内容</a>
+  <header class="topbar" id="topbar">
+    <a class="wordmark" id="wordmark" href="#top" aria-label="返回顶部"></a>
+    <nav class="primary-navigation" aria-label="主要模块">
+      <details class="travel-navigation" id="travel-navigation" hidden>
+        <summary id="travel-navigation-trigger">旅行信息</summary>
+        <div class="travel-navigation-menu" role="menu" aria-label="旅行信息栏目">
+          <a href="#flights" role="menuitem" data-module="flights" hidden>航班</a>
+          <a href="#route" role="menuitem" data-module="overview" hidden>路线</a>
+          <a href="#itinerary" role="menuitem" data-module="itinerary" hidden>行程</a>
+          <a href="#drive" role="menuitem" data-module="driving" hidden>自驾</a>
+          <a href="#prep" role="menuitem" data-module="todo" hidden>Todo</a>
+        </div>
+      </details>
+      <a class="primary-navigation__ledger" id="ledger-navigation-link" href="#ledger" data-module="ledger" hidden>记账</a>
+    </nav>
+  </header>
 
-    <header class="sticky-header" id="top">
+  <main id="main" data-site-view="travel">
+    <section class="hero" id="top" aria-labelledby="trip-title">
+      <div class="hero__eyebrow" id="trip-eyebrow"></div>
+      <h1 id="trip-title">正在载入旅程</h1>
+      <p class="hero__date" id="trip-date"></p>
+    </section>
+
+    <section class="section flights-section" id="flights" aria-labelledby="flights-title" data-module="flights" hidden>
+      <div class="section-heading">
         <div>
-            <div class="header-title">俄罗斯三城 7 日游</div>
-            <div class="header-sub">莫斯科 · 摩尔曼斯克 · 圣彼得堡 | 10/1–10/7</div>
+          <p class="section-kicker">BOARDING</p>
+          <h2 id="flights-title">航班行程</h2>
         </div>
-        <div class="countdown-pill" id="headerCountdown">
-            <span class="dot"></span>
-            <span id="headerCountdownText">距出发 15 天</span>
+        <p class="section-index" id="flight-index" aria-live="polite">1 / 3</p>
+      </div>
+      <div class="flight-carousel" id="flight-carousel" aria-label="航班卡片，可左右滑动"></div>
+      <div class="carousel-dots" id="flight-dots" aria-hidden="true"></div>
+    </section>
+
+    <section class="section route-section" id="route" aria-labelledby="route-title" data-module="overview" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">THE WHOLE JOURNEY</p>
+          <h2 id="route-title">本次旅程</h2>
         </div>
+        <span class="soft-label" id="route-day-count"></span>
+      </div>
+      <div id="route-explorer"></div>
+      <p class="route-caption">路线为行程示意，实际驾驶和步行请使用当天的 Google Maps 导航。</p>
+    </section>
+
+    <section class="section itinerary-section" id="itinerary" aria-labelledby="itinerary-title" data-module="itinerary" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">DAY BY DAY</p>
+          <h2 id="itinerary-title">每日行程</h2>
+        </div>
+        <span class="soft-label" id="day-count"></span>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section class="section drive-section" id="drive" aria-labelledby="drive-title" data-module="driving" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">ON THE ROAD</p>
+          <h2 id="drive-title">自驾信息</h2>
+        </div>
+        <span class="soft-label" id="rental-provider-label">RENTAL</span>
+      </div>
+      <div id="rental-card"></div>
+      <div class="accordion-stack" id="drive-notes"></div>
+    </section>
+
+    <section class="section prep-section" id="prep" aria-labelledby="prep-title" data-module="todo" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">BEFORE WE GO</p>
+          <h2 id="prep-title">旅行前准备</h2>
+        </div>
+        <span class="soft-label" id="todo-progress">0 / 0</span>
+      </div>
+      <form class="todo-form" id="todo-form">
+        <input id="todo-input" type="text" maxlength="80" placeholder="添加一项准备事项" aria-label="准备事项">
+        <button type="submit">添加</button>
+      </form>
+      <div class="todo-list" id="todo-list"></div>
+    </section>
+
+    <footer class="footer">
+      <p id="footer-mark"></p>
+      <a href="#top">回到顶部 ↑</a>
+    </footer>
+  </main>
+
+  <main class="ledger-view" id="ledger-view" data-site-view="ledger" data-module="ledger" hidden>
+    <div id="ledger-root"></div>
+  </main>
+
+  <dialog class="map-dialog" id="map-dialog">
+    <button type="button" class="dialog-close" id="map-close" aria-label="关闭路线图">关闭</button>
+    <div id="map-dialog-content"></div>
+  </dialog>
+
+  <dialog class="ticket-dialog" id="ticket-dialog" aria-labelledby="ticket-dialog-title">
+    <header>
+      <div>
+        <span>门票与预订</span>
+        <h2 id="ticket-dialog-title">门票详情</h2>
+      </div>
+      <button type="button" id="ticket-dialog-close" aria-label="关闭门票详情">关闭</button>
     </header>
+    <div class="ticket-dialog__body" id="ticket-dialog-body"></div>
+  </dialog>
 
-    <main class="container">
+  <div class="place-map-overlay" id="place-map" hidden>
+    <section class="place-map-sheet" role="dialog" aria-modal="true" aria-labelledby="place-map-title">
+      <header><h2 id="place-map-title">地点地图</h2><button id="place-map-close" type="button" aria-label="关闭地点地图">关闭</button></header>
+      <iframe id="place-map-frame" title="地点地图" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      <footer><p>地图需要能够访问 Google 的网络。若一直空白，请在系统浏览器中打开。</p><a id="place-map-external" target="_blank" rel="noopener noreferrer">用 Google Maps 打开 ↗</a></footer>
+    </section>
+  </div>
 
-        <!-- 航班大标签区 -->
-        <section id="flight" class="flight-hero">
-            <div class="flight-row">
-                <div class="flight-icon">✈️</div>
-                <div class="flight-info">
-                    <div class="flight-code">去程 · CZ8027</div>
-                    <div class="flight-route">
-                        广州 CAN 08:55 <span style="opacity:0.6;">→</span> 莫斯科 SVO 14:05
-                    </div>
-                    <div class="flight-time">飞行约 10 小时 · 10月1日</div>
-                </div>
-            </div>
-            <hr class="flight-divider">
-            <div class="flight-row">
-                <div class="flight-icon">✈️</div>
-                <div class="flight-info">
-                    <div class="flight-code">返程 · CZ656</div>
-                    <div class="flight-route">
-                        莫斯科 SVO 21:15 <span style="opacity:0.6;">→</span> 广州 CAN 次日11:40
-                    </div>
-                    <div class="flight-time">飞行约 9 小时 25 分钟 · 10月7日</div>
-                </div>
-            </div>
-            <div class="countdown-grid">
-                <div class="countdown-card">
-                    <div class="countdown-label">距出发</div>
-                    <div class="countdown-value" id="departCountdown">15 <small>天</small> 08:55</div>
-                </div>
-                <div class="countdown-card">
-                    <div class="countdown-label">距返程</div>
-                    <div class="countdown-value" id="returnCountdown">21 <small>天</small> 21:15</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 旅行城市地图 -->
-        <div class="section-title">🗺️ 旅行城市地图</div>
-        <div class="map-card">
-            <div id="city-map"></div>
-            <div class="map-legend">
-                <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> 莫斯科</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> 摩尔曼斯克</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> 圣彼得堡</div>
-                <div class="legend-item">✈️ 飞机</div>
-                <div class="legend-item">🚄 高铁</div>
-            </div>
-        </div>
-
-        <!-- 每日行程时间轴 -->
-        <div class="section-title" style="margin-top: 8px;">📅 每日行程</div>
-        <div class="timeline" id="timeline">
-
-            <!-- Day 1 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 1</span>
-                    <span class="day-date">10/1</span>
-                </div>
-                <div class="day-route">广州 → 莫斯科 <span>初探红场</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">08:55</span><span class="time-desc">广州白云起飞 CZ8027</span></div>
-                    <div class="time-item"><span class="time-stamp">14:05</span><span class="time-desc">落地莫斯科 SVO</span></div>
-                    <div class="time-item"><span class="time-stamp">15:30</span><span class="time-desc">机场快线 → 白俄罗斯站</span></div>
-                    <div class="time-item"><span class="time-stamp">傍晚</span><span class="time-desc">红场 · 圣瓦西里大教堂 · 扎里亚季耶公园</span></div>
-                </div>
-                <div class="day-map" id="map-day1"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.saint-basils-cathedral.ru" target="_blank">圣瓦西里大教堂官网（门票预约）</a>
-                    <a href="https://www.aeroexpress.ru" target="_blank">机场快线 Aeroexpress 官网</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 免签入境，随身携带酒店订单和返程机票备查。建议提前注册YooMoney或携带美元现金。</div>
-            </div>
-
-            <!-- Day 2 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 2</span>
-                    <span class="day-date">10/2</span>
-                </div>
-                <div class="day-route">莫斯科 → 摩尔曼斯克 <span>克里姆林宫</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">克里姆林宫 · 列宁墓 · 古姆百货</span></div>
-                    <div class="time-item"><span class="time-stamp">傍晚</span><span class="time-desc">前往 SVO 机场</span></div>
-                    <div class="time-item"><span class="time-stamp">17:55</span><span class="time-desc">SU1326 飞往摩尔曼斯克 (20:25落地)</span></div>
-                </div>
-                <div class="day-map" id="map-day2"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.kreml.ru" target="_blank">克里姆林宫官网（教堂/武器库门票）</a>
-                    <a href="https://www.aeroflot.ru" target="_blank">俄罗斯航空 Aeroflot 官网（SU1326）</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 克里姆林宫周四闭馆，建议官网提前购票。莫斯科-摩尔曼斯克选飞机，火车需35小时。</div>
-            </div>
-
-            <!-- Day 3 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 3</span>
-                    <span class="day-date">10/3</span>
-                </div>
-                <div class="day-route">摩尔曼斯克 <span>极光基地</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">列宁号核动力破冰船（需预约）</span></div>
-                    <div class="time-item"><span class="time-stamp">下午</span><span class="time-desc">萨米民族村 · 驯鹿拉雪橇</span></div>
-                    <div class="time-item"><span class="time-stamp">夜晚</span><span class="time-desc">捷里别尔卡方向追光</span></div>
-                    <div class="time-item"><span class="time-stamp">凌晨</span><span class="time-desc">返回市区酒店</span></div>
-                </div>
-                <div class="day-map" id="map-day3"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.icebreaker-lenin.ru" target="_blank">列宁号核动力破冰船官网（场次预约）</a>
-                    <a href="https://www.samivillage.ru" target="_blank">萨米民族村官网（体验项目预约）</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 10月初极光可见概率有但不保证，建议下载Aurora Forecast查看KP指数。夜间包车追光最稳妥，务必穿羽绒服。</div>
-            </div>
-
-            <!-- Day 4 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 4</span>
-                    <span class="day-date">10/4</span>
-                </div>
-                <div class="day-route">摩尔曼斯克 → 圣彼得堡 <span>阿廖沙</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">阿廖沙纪念碑俯瞰科拉湾</span></div>
-                    <div class="time-item"><span class="time-stamp">下午</span><span class="time-desc">前往摩尔曼斯克机场</span></div>
-                    <div class="time-item"><span class="time-stamp">19:15</span><span class="time-desc">SU6346 飞往圣彼得堡 (21:15落地)</span></div>
-                    <div class="time-item"><span class="time-stamp">晚间</span><span class="time-desc">入住涅瓦大街附近，散步</span></div>
-                </div>
-                <div class="day-map" id="map-day4"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.aeroflot.ru" target="_blank">俄罗斯航空 Aeroflot 官网（SU6346）</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 圣彼得堡地铁使用“车前草”卡或银联卡。景点集中在涅瓦大街，建议住在市中心。</div>
-            </div>
-
-            <!-- Day 5 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 5</span>
-                    <span class="day-date">10/5</span>
-                </div>
-                <div class="day-route">圣彼得堡 <span>冬宫·滴血教堂</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">冬宫（艾尔米塔什博物馆）</span></div>
-                    <div class="time-item"><span class="time-stamp">下午</span><span class="time-desc">滴血救世主教堂 · 喀山大教堂</span></div>
-                    <div class="time-item"><span class="time-stamp">傍晚</span><span class="time-desc">涅瓦大街散步 / 可选游船</span></div>
-                </div>
-                <div class="day-map" id="map-day5"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.hermitagemuseum.org" target="_blank">冬宫（艾尔米塔什）官网购票</a>
-                    <a href="https://www.spas-na-krovi.ru" target="_blank">滴血救世主教堂官网</a>
-                    <a href="https://www.kazancathedral.ru" target="_blank">喀山大教堂官网</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 冬宫周一闭馆，官网提前购票免排队。10月初圣彼得堡10-17°C，随身带伞。</div>
-            </div>
-
-            <!-- Day 6 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 6</span>
-                    <span class="day-date">10/6</span>
-                </div>
-                <div class="day-route">圣彼得堡 → 莫斯科 <span>夏宫·高铁</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">彼得霍夫宫（夏宫）水翼船往返</span></div>
-                    <div class="time-item"><span class="time-stamp">下午</span><span class="time-desc">莫斯科火车站乘高铁</span></div>
-                    <div class="time-item"><span class="time-stamp">晚间</span><span class="time-desc">抵达莫斯科列宁格勒站，入住酒店</span></div>
-                </div>
-                <div class="day-map" id="map-day6"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.peterhofmuseum.ru" target="_blank">彼得霍夫宫（夏宫）官网</a>
-                    <a href="https://www.rzd.ru" target="_blank">俄铁官网 RZD（高铁购票）</a>
-                    <a href="https://pass.rzd.ru" target="_blank">俄铁英文购票页面</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> 高铁票提前在俄铁官网(rzd.ru)购买，约3.5-4小时。夏宫水翼船受天气影响，出发前确认。</div>
-            </div>
-
-            <!-- Day 7 -->
-            <div class="day-card">
-                <div class="day-header">
-                    <span class="day-badge">Day 7</span>
-                    <span class="day-date">10/7</span>
-                </div>
-                <div class="day-route">莫斯科 → 广州 <span>地铁巡游·返程</span></div>
-                <div class="timeline-items">
-                    <div class="time-item"><span class="time-stamp">上午</span><span class="time-desc">马雅可夫斯基站 · 共青团站 · 阿尔巴特大街</span></div>
-                    <div class="time-item"><span class="time-stamp">14:00前</span><span class="time-desc">返回酒店取行李，乘机场快线至SVO</span></div>
-                    <div class="time-item"><span class="time-stamp">21:15</span><span class="time-desc">CZ656 返程广州 (次日11:40抵达)</span></div>
-                </div>
-                <div class="day-map" id="map-day7"></div>
-                <div class="booking-links">
-                    <div class="label">🔖 预约 / 购票</div>
-                    <a href="https://www.aeroexpress.ru" target="_blank">机场快线 Aeroexpress 官网</a>
-                    <a href="https://www.csair.com" target="_blank">中国南方航空官网（CZ656）</a>
-                </div>
-                <div class="day-tip"><span class="emoji">💡</span> SVO建议提前3小时到达。机场快线从白俄罗斯站出发约50分钟。卢布可在机场兑换回。</div>
-            </div>
-
-        </div>
-
-        <!-- 底部备注 -->
-        <div class="footer-note">
-            <strong>📌 实用信息</strong><br>
-            · 免签：中国公民赴俄旅游免签，停留不超过30天。<br>
-            · 支付：Visa/Mastercard不可用，建议YooMoney或携带美元/人民币现金兑换。<br>
-            · 俄铁购票：<a href="https://www.rzd.ru" target="_blank">https://www.rzd.ru</a>（英文页面 pass.rzd.ru）<br>
-            · 天气：摩尔曼斯克10月初接近0°C，圣彼得堡10-17°C。
-        </div>
-
-    </main>
-
-    <script>
-        // ---------- 倒计时逻辑（保持不变） ----------
-        (function() {
-            const now = new Date();
-            let year = now.getFullYear();
-            const departDate = new Date(year, 9, 1, 8, 55, 0);
-            const returnDate = new Date(year, 9, 7, 21, 15, 0);
-
-            if (now > returnDate) {
-                year += 1;
-                departDate.setFullYear(year);
-                returnDate.setFullYear(year);
-            }
-
-            function updateCountdown() {
-                const nowTime = new Date().getTime();
-                const departDiff = departDate.getTime() - nowTime;
-                const returnDiff = returnDate.getTime() - nowTime;
-
-                const headerSpan = document.getElementById('headerCountdownText');
-                const departEl = document.getElementById('departCountdown');
-                const returnEl = document.getElementById('returnCountdown');
-
-                if (departDiff <= 0) {
-                    if (headerSpan) headerSpan.textContent = '已出发';
-                    if (departEl) departEl.innerHTML = '已出发';
-                } else {
-                    const days = Math.floor(departDiff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((departDiff % (86400000)) / (3600000));
-                    const mins = Math.floor((departDiff % 3600000) / 60000);
-                    if (headerSpan) headerSpan.textContent = `距出发 ${days} 天 ${hours} 时`;
-                    if (departEl) departEl.innerHTML = `${days} <small>天</small> ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
-                }
-
-                if (returnDiff <= 0) {
-                    if (returnEl) returnEl.innerHTML = '已返程';
-                } else {
-                    const days = Math.floor(returnDiff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((returnDiff % (86400000)) / (3600000));
-                    const mins = Math.floor((returnDiff % 3600000) / 60000);
-                    if (returnEl) returnEl.innerHTML = `${days} <small>天</small> ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
-                }
-            }
-
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-
-            document.getElementById('headerCountdown').addEventListener('click', () => {
-                document.getElementById('flight').scrollIntoView({ behavior: 'smooth' });
-            });
-        })();
-
-        // ---------- Google Maps 初始化 ----------
-        // 全局回调函数，API 加载完成后调用
-        function initMaps() {
-            // 城市地图
-            const cityMapEl = document.getElementById('city-map');
-            if (cityMapEl) {
-                const moscow = { lat: 55.7558, lng: 37.6173 };
-                const murmansk = { lat: 68.9585, lng: 33.0827 };
-                const spb = { lat: 59.9343, lng: 30.3351 };
-
-                const cityMap = new google.maps.Map(cityMapEl, {
-                    zoom: 4,
-                    center: { lat: 64.0, lng: 50.0 },
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false,
-                    zoomControl: true,
-                    styles: [ /* 可选：自定义样式，此处留空则使用默认 */ ]
-                });
-
-                // 标记
-                new google.maps.Marker({
-                    position: moscow,
-                    map: cityMap,
-                    title: '莫斯科',
-                    label: { text: '莫', color: 'white', fontSize: '10px', fontWeight: 'bold' },
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: '#ef4444',
-                        fillOpacity: 1,
-                        strokeColor: 'white',
-                        strokeWeight: 2
-                    }
-                });
-                new google.maps.Marker({
-                    position: murmansk,
-                    map: cityMap,
-                    title: '摩尔曼斯克',
-                    label: { text: '摩', color: 'white', fontSize: '10px', fontWeight: 'bold' },
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: '#3b82f6',
-                        fillOpacity: 1,
-                        strokeColor: 'white',
-                        strokeWeight: 2
-                    }
-                });
-                new google.maps.Marker({
-                    position: spb,
-                    map: cityMap,
-                    title: '圣彼得堡',
-                    label: { text: '圣', color: 'white', fontSize: '10px', fontWeight: 'bold' },
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: '#10b981',
-                        fillOpacity: 1,
-                        strokeColor: 'white',
-                        strokeWeight: 2
-                    }
-                });
-
-                // 连线：莫斯科→摩尔曼斯克（飞机）
-                new google.maps.Polyline({
-                    path: [moscow, murmansk],
-                    geodesic: true,
-                    strokeColor: '#3b82f6',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    map: cityMap,
-                    icons: [{
-                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 },
-                        offset: '0',
-                        repeat: '20px'
-                    }]
-                });
-                // 摩尔曼斯克→圣彼得堡（飞机）
-                new google.maps.Polyline({
-                    path: [murmansk, spb],
-                    geodesic: true,
-                    strokeColor: '#3b82f6',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    map: cityMap,
-                    icons: [{
-                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 },
-                        offset: '0',
-                        repeat: '20px'
-                    }]
-                });
-                // 圣彼得堡→莫斯科（高铁）
-                new google.maps.Polyline({
-                    path: [spb, moscow],
-                    geodesic: true,
-                    strokeColor: '#f59e0b',
-                    strokeOpacity: 0.9,
-                    strokeWeight: 2,
-                    map: cityMap
-                });
-
-                // 调整视野包含所有点
-                const bounds = new google.maps.LatLngBounds();
-                bounds.extend(moscow);
-                bounds.extend(murmansk);
-                bounds.extend(spb);
-                cityMap.fitBounds(bounds, { padding: 30 });
-            }
-
-            // 每日地图初始化函数
-            function initDayMap(containerId, points, zoom = 12, center = null) {
-                const el = document.getElementById(containerId);
-                if (!el) return;
-
-                const map = new google.maps.Map(el, {
-                    zoom: zoom,
-                    center: center || points[0],
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false,
-                    zoomControl: true
-                });
-
-                const bounds = new google.maps.LatLngBounds();
-                const path = [];
-
-                points.forEach((p, idx) => {
-                    const pos = { lat: p.lat, lng: p.lng };
-                    bounds.extend(pos);
-                    path.push(pos);
-
-                    new google.maps.Marker({
-                        position: pos,
-                        map: map,
-                        title: p.name,
-                        label: {
-                            text: String(idx + 1),
-                            color: 'white',
-                            fontSize: '11px',
-                            fontWeight: 'bold'
-                        },
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 12,
-                            fillColor: idx === 0 ? '#10b981' : (idx === points.length - 1 ? '#ef4444' : '#3b82f6'),
-                            fillOpacity: 1,
-                            strokeColor: 'white',
-                            strokeWeight: 2
-                        }
-                    });
-                });
-
-                if (path.length > 1) {
-                    new google.maps.Polyline({
-                        path: path,
-                        geodesic: true,
-                        strokeColor: '#3b82f6',
-                        strokeOpacity: 0.7,
-                        strokeWeight: 2,
-                        map: map,
-                        icons: [{
-                            icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 },
-                            offset: '0',
-                            repeat: '20px'
-                        }]
-                    });
-                }
-
-                // 自动调整视野
-                if (!center && points.length > 1) {
-                    map.fitBounds(bounds, { padding: 40 });
-                } else if (center) {
-                    map.setCenter(center);
-                }
-            }
-
-            // 初始化各日地图（坐标数据与之前一致）
-            initDayMap('map-day1', [
-                { lat: 55.9726, lng: 37.4146, name: 'SVO 机场' },
-                { lat: 55.7761, lng: 37.5825, name: '白俄罗斯站' },
-                { lat: 55.7539, lng: 37.6208, name: '红场' },
-                { lat: 55.7525, lng: 37.6231, name: '圣瓦西里大教堂' },
-                { lat: 55.7510, lng: 37.6290, name: '扎里亚季耶公园' }
-            ]);
-
-            initDayMap('map-day2', [
-                { lat: 55.7520, lng: 37.6175, name: '克里姆林宫' },
-                { lat: 55.7539, lng: 37.6208, name: '列宁墓' },
-                { lat: 55.7558, lng: 37.6215, name: '古姆百货' },
-                { lat: 55.9726, lng: 37.4146, name: 'SVO 机场' }
-            ], 10, { lat: 55.85, lng: 37.6 });
-
-            initDayMap('map-day3', [
-                { lat: 68.9585, lng: 33.0827, name: '市区酒店' },
-                { lat: 68.9700, lng: 33.0800, name: '列宁号破冰船' },
-                { lat: 68.8500, lng: 33.0000, name: '萨米民族村' },
-                { lat: 69.2000, lng: 35.1000, name: '捷里别尔卡方向' }
-            ], 8, { lat: 68.95, lng: 33.5 });
-
-            initDayMap('map-day4', [
-                { lat: 68.9800, lng: 33.0800, name: '阿廖沙纪念碑' },
-                { lat: 68.7800, lng: 32.7500, name: '摩尔曼斯克机场' },
-                { lat: 59.8000, lng: 30.2700, name: '圣彼得堡机场 LED' }
-            ], 6, { lat: 64.0, lng: 32.0 });
-
-            initDayMap('map-day5', [
-                { lat: 59.9410, lng: 30.3140, name: '冬宫' },
-                { lat: 59.9400, lng: 30.3290, name: '滴血救世主教堂' },
-                { lat: 59.9340, lng: 30.3240, name: '喀山大教堂' },
-                { lat: 59.9330, lng: 30.3350, name: '涅瓦大街' }
-            ], 14, { lat: 59.937, lng: 30.325 });
-
-            initDayMap('map-day6', [
-                { lat: 59.8850, lng: 29.9080, name: '彼得霍夫宫(夏宫)' },
-                { lat: 59.9300, lng: 30.3600, name: '莫斯科火车站' },
-                { lat: 55.7761, lng: 37.5825, name: '列宁格勒火车站' }
-            ], 6, { lat: 57.0, lng: 33.0 });
-
-            initDayMap('map-day7', [
-                { lat: 55.7700, lng: 37.5900, name: '马雅可夫斯基站' },
-                { lat: 55.7750, lng: 37.6550, name: '共青团站' },
-                { lat: 55.7520, lng: 37.5900, name: '阿尔巴特大街' },
-                { lat: 55.9726, lng: 37.4146, name: 'SVO 机场' }
-            ], 10, { lat: 55.85, lng: 37.55 });
-        }
-    </script>
-
+  <div class="loading-error" id="loading-error" hidden>
+    <strong>行程暂时无法载入</strong>
+    <span>请确认 trip-data.json 已通过生成校验，并与网页位于同一目录。</span>
+  </div>
 </body>
 </html>
